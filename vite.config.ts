@@ -3,11 +3,16 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  // sqlite-wasm localiza o .wasm via import.meta.url; o pre-bundle do Vite quebraria isso.
+  optimizeDeps: { exclude: ['@sqlite.org/sqlite-wasm'] },
+  worker: { format: 'es' },
   plugins: [
     svelte(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
+      // Precache inclui o sqlite3.wasm para o app abrir offline.
+      workbox: { globPatterns: ['**/*.{js,css,html,wasm,png,svg,webmanifest}'] },
       manifest: {
         name: 'Mecanica Systems',
         short_name: 'Mecanica',

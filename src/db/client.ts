@@ -1,0 +1,56 @@
+// Cliente RPC (thread principal) para o worker SQLite. Cada chamada vira uma Promise.
+import type { CodigoErro, Linha, NomeOp, Operacoes, Parametros, Requisicao, Resposta, VersaoInfo } from './protocol';
+
+export class ErroBanco extends Error {
+  constructor(
+    msg: string,
+    public readonly codigo?: CodigoErro,
+  ) {
+    super(msg);
+    this.name = 'ErroBanco';
+  }
+}
+
+type Pendente = { resolve: (v: unknown) => void; reject: (e: Error) => void };
+
+let worker: Worker | null = null;
+let proximoId = 1;
+const pendentes = new Map<number, Pendente>();
+
+function falharTodos(erro: Error): void {
+  for (const p of pendentes.values()) p.reject(erro);
+  pendentes.clear();
+}
+
+function obterWorker(): Worker {
+  if (worker) return worker;
+  const w = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module', name: 'sqlite' });
+  w.addEventListener('message', (e: MessageEvent<Resposta>) => {
+    const r = e.data;
+    const p = pendentes.get(r.id);
+    if (!p) return;
+    pendentes.delete(r.id);
+    if (r.ok) p.resolve(r.resp);
+    else p.reject(new ErroBanco(r.erro, r.codigo));
+  });
+  w.addEventListener('error', (e) => {
+    falharTodos(new ErroBanco(`Falha no worker do banco: ${e.message || 'erro desconhecido'}`, 'INIT'));
+  });
+  worker = w;
+  return w;
+}
+
+function chamar<K extends NomeOp>(op: K, req: Operacoes[K]['req']): Promise<Operacoes[K]['resp']> {
+  const w = obterWorker();
+  const id = proximoId++;
+  return new Promise((resolve, reject) => {
+    pendentes.set(id, { resolve: resolve as (v: unknown) => void, reject });
+    w.postMessage({ id, op, req } as Requisicao);
+  });
+}
+
+export const db = {
+  exec: (sql: string, bind?: Parametros) => chamar('exec', { sql, bind }),
+  query: <T extends Linha = Linha>(sql: string, bind?: Parametros) => chamar('query', { sql, bind }) as Promise<T[]>,
+  versaoInfo: (): Promise<VersaoInfo> => chamar('versaoInfo', {}),
+};
