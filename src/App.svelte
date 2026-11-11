@@ -7,6 +7,22 @@
   import IncompativelTela from './components/IncompativelTela.svelte';
   import AbaDuplicada from './components/AbaDuplicada.svelte';
   import StatusArmazenamento from './components/StatusArmazenamento.svelte';
+  import BuscaPlaca from './components/BuscaPlaca.svelte';
+  import Clientes from './components/Clientes.svelte';
+  import Veiculos from './components/Veiculos.svelte';
+
+  type Aba = 'inicio' | 'clientes' | 'veiculos';
+  let aba = $state<Aba>('inicio');
+  let clienteParaAbrir = $state<number | null>(null);
+
+  function abrirCliente(id: number) {
+    clienteParaAbrir = id;
+    aba = 'clientes';
+  }
+  function irParaAba(a: Aba) {
+    aba = a;
+    if (a === 'inicio') atualizarContagem().catch(() => {});
+  }
 
   type Fase = 'iniciando' | 'incompativel' | 'aba-duplicada' | 'pronto' | 'erro';
 
@@ -156,6 +172,19 @@
         <p class="aviso" role="status">{avisoPersistencia}</p>
       {/if}
 
+      <BuscaPlaca aoAbrirCliente={abrirCliente} />
+
+      <nav class="abas" aria-label="Seções">
+        <button type="button" data-testid="aba-inicio" class:sel={aba === 'inicio'} onclick={() => irParaAba('inicio')}>Início</button>
+        <button type="button" data-testid="aba-clientes" class:sel={aba === 'clientes'} onclick={() => irParaAba('clientes')}>Clientes</button>
+        <button type="button" data-testid="aba-veiculos" class:sel={aba === 'veiculos'} onclick={() => irParaAba('veiculos')}>Veículos</button>
+      </nav>
+
+      {#if aba === 'clientes'}
+        <Clientes abrirId={clienteParaAbrir} aoMudar={() => atualizarContagem().catch(() => {})} />
+      {:else if aba === 'veiculos'}
+        <Veiculos aoAbrirCliente={abrirCliente} />
+      {:else}
       <section>
         <h2>Diagnóstico do banco</h2>
         {#if info}
@@ -190,6 +219,7 @@
         {#if msgBackup}<p role="status" data-testid="msg-backup">{msgBackup}</p>{/if}
         {#if erroBackup}<p class="erro" role="alert" data-testid="erro-backup">{erroBackup}</p>{/if}
       </section>
+      {/if}
     {/if}
   </main>
 {/if}
@@ -202,4 +232,7 @@
   .aviso { color: #92400e; background: #fef3c7; padding: 0.5rem; }
   section { margin-top: 1rem; }
   button { margin-right: 0.5rem; }
+  .abas { display: flex; gap: 0.25rem; border-bottom: 2px solid #d1d5db; margin-bottom: 1rem; }
+  .abas button { margin: 0; padding: 0.5rem 1.25rem; border: 1px solid #d1d5db; border-bottom: none; background: #f9fafb; font-size: 1rem; cursor: pointer; }
+  .abas button.sel { background: #fff; font-weight: 700; border-color: #3b82f6; }
 </style>
