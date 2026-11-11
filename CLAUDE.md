@@ -15,12 +15,14 @@ Sistema de gestão para oficinas mecânicas: PWA local-first (offline, dados no 
 - Dúvida que não dá para pesquisar: perguntar ao Pedro.
 - Licença: All rights reserved (portfólio). Não adicionar licença open source.
 
-## Próximos passos (ordem de construção)
-1. Esqueleto PWA + SQLite OPFS + migração v1 + teste grava/fecha/reabre (fase 0)
-2. Clientes e veículos (busca por placa) 3. Catálogo 4. Orçamento/OS 5. Pagamentos e estoque 6. PDF/WhatsApp 7. Backup 8. Teste com oficina real
+## Como retomar em outro PC
+- `git clone https://github.com/PEDRO-DEL-COL/mecanica-systems.git`, `npm install`, abrir a pasta no VS Code (fora de OneDrive e de caminhos com acento). Este arquivo é o contexto do projeto; o histórico da conversa NÃO é sincronizado entre PCs.
+- Verificar: `npm test`, `npm run check`, `npm run build`, `npm run e2e` (precisa de Chrome ou Edge).
 
-## Status
-- Fase 0 implementada (PWA, SQLite OPFS em worker, migração v1, backup exportar/importar, trava de aba única). Pendente apenas de validação E2E em Chrome/Edge reais (testes em tests/e2e já escritos; rodar `npm run e2e`).
+## Status (atualizado em 2026-11-11)
+- FEITO e verificado (testes unitários + E2E em Chrome): fase 0 completa (PWA, SQLite OPFS em worker, migrações, backup exportar/importar, trava de aba única, persistência) e passo 2 da fase 1 (clientes e veículos, busca por placa).
+- PRÓXIMO: 3 Catálogo de serviços e peças -> 4 Orçamento/OS (CDC: só vai a em_execucao com aprovação) -> 5 Pagamentos e estoque -> 6 PDF/WhatsApp -> 7 lembretes de backup -> 8 teste com oficina real. Depois: publicar no Cloudflare Pages.
+- Pendentes do Pedro: proteger a branch main no GitHub; apagar a pasta antiga no OneDrive.
 
 ## Decisões novas
 - TypeScript fixado em 6.0.3; @sqlite.org/sqlite-wasm fixado em 3.54.1-build1 (versões exatas, sem ^).
