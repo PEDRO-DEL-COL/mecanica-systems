@@ -34,18 +34,30 @@ function obterWorker(): Worker {
     else p.reject(new ErroBanco(r.erro, r.codigo));
   });
   w.addEventListener('error', (e) => {
-    falharTodos(new ErroBanco(`Falha no worker do banco: ${e.message || 'erro desconhecido'}`, 'INIT'));
+    // Erro nao tratado no worker (ex.: falha ao carregar o modulo/wasm): nunca silencioso.
+    falhaFatal = new ErroBanco(`Falha no worker do banco: ${e.message || 'erro desconhecido'}`, 'INIT');
+    falharTodos(falhaFatal);
+  });
+  w.addEventListener('messageerror', () => {
+    falharTodos(new ErroBanco('Mensagem do worker do banco não pôde ser lida.', 'INIT'));
   });
   worker = w;
   return w;
 }
 
-function chamar<K extends NomeOp>(op: K, req: Operacoes[K]['req']): Promise<Operacoes[K]['resp']> {
+let falhaFatal: ErroBanco | null = null;
+
+function chamar<K extends NomeOp>(
+  op: K,
+  req: Operacoes[K]['req'],
+  transfer: Transferable[] = [],
+): Promise<Operacoes[K]['resp']> {
+  if (falhaFatal) return Promise.reject(falhaFatal);
   const w = obterWorker();
   const id = proximoId++;
   return new Promise((resolve, reject) => {
     pendentes.set(id, { resolve: resolve as (v: unknown) => void, reject });
-    w.postMessage({ id, op, req } as Requisicao);
+    w.postMessage({ id, op, req } as Requisicao, transfer);
   });
 }
 
@@ -53,4 +65,10 @@ export const db = {
   exec: (sql: string, bind?: Parametros) => chamar('exec', { sql, bind }),
   query: <T extends Linha = Linha>(sql: string, bind?: Parametros) => chamar('query', { sql, bind }) as Promise<T[]>,
   versaoInfo: (): Promise<VersaoInfo> => chamar('versaoInfo', {}),
+  /** Bytes do banco atual (export do opfs-sahpool). */
+  exportar: () => chamar('exportar', {}),
+  /** Valida em copia temporaria; nao altera o banco. `bytes` e copiado (nao transferido). */
+  validarBackup: (bytes: Uint8Array) => chamar('validarBackup', { bytes }),
+  /** Substitui o banco pelo backup (o worker revalida antes). `bytes` e transferido. */
+  importar: (bytes: Uint8Array) => chamar('importar', { bytes }, [bytes.buffer as ArrayBuffer]),
 };
