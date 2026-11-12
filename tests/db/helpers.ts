@@ -8,6 +8,10 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { PGlite } from '@electric-sql/pglite';
+// Extensões contrib que as migrations criam (create extension ... with schema
+// extensions). O PGlite 0.5.x traz pg_trgm e unaccent (com unaccent.rules).
+import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
+import { unaccent } from '@electric-sql/pglite/contrib/unaccent';
 
 const PASTA_MIGRATIONS = join(process.cwd(), 'supabase', 'migrations');
 
@@ -37,6 +41,10 @@ language sql stable as $$
 $$;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 
+-- No Supabase o schema "extensions" existe e tem USAGE para as roles da API.
+create schema if not exists extensions;
+grant usage on schema extensions to anon, authenticated, service_role;
+
 grant usage on schema public to anon, authenticated, service_role;
 alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
 alter default privileges in schema public grant all on functions to anon, authenticated, service_role;
@@ -57,7 +65,7 @@ export async function aplicarMigrations(db: PGlite): Promise<void> {
 
 /** Cria um Postgres em memória com o stub do Supabase e as migrations aplicadas. */
 export async function criarBanco(opcoes: { aplicarDuasVezes?: boolean } = {}): Promise<PGlite> {
-  const db = new PGlite();
+  const db = new PGlite({ extensions: { pg_trgm, unaccent } });
   await db.exec(STUB_SUPABASE);
   await aplicarMigrations(db);
   if (opcoes.aplicarDuasVezes) await aplicarMigrations(db);
