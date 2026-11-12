@@ -27,7 +27,7 @@ Versão 2026-11-12. Fonte: `PROJETO.md`, `pesquisa/*.md`, migrações do núcleo
 | aprovado -> em_execucao | escrita | baixa de estoque das peças aprovadas |
 | em_execucao -> concluido | escrita | nenhum aditivo pendente de decisão |
 | concluido -> em_execucao | escrita | motivo (retrabalho interno) |
-| concluido -> entregue | escrita | grava `data_entrega` e `garantia_ate`; saldo quitado **ou** títulos a receber gerados (precisa `financeiro/escrita`, ver 5) |
+| concluido -> entregue | escrita | grava `data_entrega` e `garantia_ate`; saldo quitado **ou** títulos a receber gerados (precisa `caixa/escrita`, ver 5) |
 | entregue -> concluido (reabrir) | só dono | motivo; não apaga pagamentos |
 | orcamento/aprovado -> cancelado | escrita | motivo obrigatório |
 | em_execucao/concluido -> cancelado | só dono | motivo; estorno automático do estoque baixado; bloqueia se houver pagamento não estornado |
@@ -62,7 +62,7 @@ Toda transição é RPC `security definer` (`os_transicionar`) que valida matriz
 - `pagamento` append-only: título, valor, forma (`dinheiro`, `pix`, `debito`, `credito`, `boleto`, `transferencia`, `outro`), parcelas do cartão, taxa (opcional), data, sessão de caixa. Estorno = nova linha com `estorna_id` (só dono). Pagamento misto = várias linhas.
 - Receber OS: sinal permitido antes da entrega; na entrega, saldo vira pagamento(s) ou parcelas a receber. Receita é reconhecida em `entregue` (relatórios usam `data_entrega`).
 - Caixa: uma sessão aberta por oficina (MVP); abertura com troco, sangria/suprimento com motivo, fechamento com contagem por forma e diferença registrada. Pagamento em dinheiro exige caixa aberto.
-- Decisão: receber pagamento exige `financeiro/escrita` (o atendente sem financeiro só vê o total da OS).
+- Decisão (Pedro, 2026-11-12): receber pagamento e operar o caixa exigem `caixa/escrita`; o atendente recebe sem ver custos nem margens, que ficam só com `financeiro`. As telas do caixa ficam em `/app/caixa` (não em `financeiro/caixa`).
 
 ## 6. Permissões
 Áreas (lista única em `private.areas()`): `clientes, veiculos, catalogo, estoque, ordens, caixa, financeiro, equipe, configuracoes` (`caixa` = receber pagamentos e operar o caixa; `financeiro` = única que vê custos, margens, contas a pagar e relatórios); níveis `leitura`/`escrita` (escrita implica leitura); sem linha = sem acesso. Dono: tudo. Barreira real = RLS/RPC (`private.pode`); a UI só esconde.

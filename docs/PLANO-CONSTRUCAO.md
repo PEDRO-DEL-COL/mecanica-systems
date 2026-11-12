@@ -64,7 +64,7 @@ Responda em até 8 linhas: o que fez, arquivos, resultado dos comandos, pendênc
 
 ## Onda D — financeiro, equipe e acabamento (paralelo; depende da C)
 - **D1 SONNET Contas a receber/pagar e categorias.** Cria: `src/routes/(app)/app/financeiro/{+page.svelte,receber,pagar,categorias}/**`, `src/lib/financeiro/Titulos*.svelte`, `tests/e2e/financeiro.spec.ts`.
-- **D2 SONNET Caixa.** Cria: `src/routes/(app)/app/financeiro/caixa/**`, `src/lib/financeiro/Caixa*.svelte`, `tests/e2e/caixa.spec.ts`. Aceite: abrir, sangria/suprimento, fechar com diferença por forma.
+- **D2 SONNET Caixa.** Cria: `src/routes/(app)/app/caixa/**` (área `caixa`, não `financeiro`), `src/lib/caixa/Caixa*.svelte`, `tests/e2e/caixa.spec.ts`. Aceite: abrir, sangria/suprimento, fechar com diferença por forma.
 - **D3 SONNET Receber/entregar/garantia na OS.** Cria: `src/lib/ordens/{Receber,Entregar,Garantia}*.svelte`, `tests/e2e/ordens-entrega.spec.ts`. Edita: `src/lib/ordens/BarraTransicoes.svelte`. Aceite: pagamento misto; entrega gera garantia; abrir garantia cria OS vinculada.
 - **D4 SONNET Equipe e convites.** Cria: `src/routes/(app)/app/equipe/**`, `src/routes/convite/[token]/**` (ssr=false), `src/lib/equipe/*`, `src/lib/repos/equipe.ts`, `tests/e2e/equipe.spec.ts`. Aceite: matriz de áreas com dependências automáticas; link copiável; desativar com confirmação. [SB] aceite real do convite.
 - **D5 SONNET Configurações.** Cria: `src/routes/(app)/app/configuracoes/**`, `src/lib/configuracoes/*`, `tests/e2e/configuracoes.spec.ts`. Aceite: garantia < 90 recusada; exportar oficina baixa JSON.

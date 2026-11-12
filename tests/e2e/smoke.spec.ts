@@ -5,7 +5,7 @@ test('landing abre', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 });
 
-test('/app abre (fallback SPA)', async ({ page }) => {
+test('/app abre pelo fallback SPA e, sem sessão, redireciona a /entrar', async ({ page }) => {
   await page.goto('/app');
-  await expect(page.getByRole('heading', { name: 'App' })).toBeVisible();
+  await expect(page).toHaveURL(/\/entrar$/);
 });
