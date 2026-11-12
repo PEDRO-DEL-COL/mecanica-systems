@@ -10,8 +10,17 @@
   import BuscaPlaca from './components/BuscaPlaca.svelte';
   import Clientes from './components/Clientes.svelte';
   import Veiculos from './components/Veiculos.svelte';
+  import './styles/tokens.css';
+  import './styles/base.css';
 
   type Aba = 'inicio' | 'clientes' | 'veiculos';
+  // Para adicionar uma tela: incluir aqui (icone = path SVG 24x24) e tratar no bloco {#if aba} abaixo.
+  const rotas: { id: Aba; rotulo: string; icone: string }[] = [
+    { id: 'inicio', rotulo: 'Início', icone: 'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10' },
+    { id: 'clientes', rotulo: 'Clientes', icone: 'M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM20 19v-1.5a3.5 3.5 0 0 0-2.5-3.35M15.5 4.2a3.5 3.5 0 0 1 0 6.6' },
+    { id: 'veiculos', rotulo: 'Veículos', icone: 'M4 16v-4l2-5h12l2 5v4M4 16h16M4 16v2h3v-2M17 16v2h3v-2M7.5 12.5h.01M16.5 12.5h.01' },
+  ];
+  const tituloAba = $derived(rotas.find((r) => r.id === aba)?.rotulo ?? '');
   let aba = $state<Aba>('inicio');
   let clienteParaAbrir = $state<number | null>(null);
 
@@ -154,85 +163,131 @@
 {:else if fase === 'aba-duplicada'}
   <AbaDuplicada />
 {:else}
-  <main>
-    <h1>Mecanica Systems</h1>
-    {#each compat.avisos as aviso}
-      <p class="aviso" role="status">{aviso}</p>
-    {/each}
-
-    {#if fase === 'erro'}
-      <p class="erro" role="alert" data-testid="erro-banco">{erro}</p>
-    {:else if fase === 'iniciando'}
-      <p>Abrindo banco…</p>
-    {:else}
-      {#if persistencia}
-        <StatusArmazenamento {...persistencia} />
+  <div class="app">
+    <aside class="lateral">
+      <div class="marca">
+        <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.4 2.4-2.1-.6-.6-2.1z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <h1>Mecanica Systems</h1>
+      </div>
+      {#if fase === 'pronto'}
+        <nav class="menu" aria-label="Seções">
+          {#each rotas as r (r.id)}
+            <button type="button" data-testid={`aba-${r.id}`} class:sel={aba === r.id} aria-current={aba === r.id ? 'page' : undefined} onclick={() => irParaAba(r.id)}>
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d={r.icone} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {r.rotulo}
+            </button>
+          {/each}
+        </nav>
       {/if}
-      {#if avisoPersistencia}
-        <p class="aviso" role="status">{avisoPersistencia}</p>
-      {/if}
+    </aside>
 
-      <BuscaPlaca aoAbrirCliente={abrirCliente} />
+    <div class="principal">
+      <header class="topo">
+        <h2 class="titulo-pagina">{fase === 'pronto' ? tituloAba : ''}</h2>
+        {#if fase === 'pronto'}<BuscaPlaca aoAbrirCliente={abrirCliente} />{/if}
+      </header>
 
-      <nav class="abas" aria-label="Seções">
-        <button type="button" data-testid="aba-inicio" class:sel={aba === 'inicio'} onclick={() => irParaAba('inicio')}>Início</button>
-        <button type="button" data-testid="aba-clientes" class:sel={aba === 'clientes'} onclick={() => irParaAba('clientes')}>Clientes</button>
-        <button type="button" data-testid="aba-veiculos" class:sel={aba === 'veiculos'} onclick={() => irParaAba('veiculos')}>Veículos</button>
-      </nav>
+      <main class="conteudo">
+        {#each compat.avisos as aviso}
+          <p class="alerta alerta-aviso" role="status">{aviso}</p>
+        {/each}
 
-      {#if aba === 'clientes'}
-        <Clientes abrirId={clienteParaAbrir} aoMudar={() => atualizarContagem().catch(() => {})} />
-      {:else if aba === 'veiculos'}
-        <Veiculos aoAbrirCliente={abrirCliente} />
-      {:else}
-      <section>
-        <h2>Diagnóstico do banco</h2>
-        {#if info}
-          <dl>
-            <dt>SQLite</dt><dd>{info.sqlite}</dd>
-            <dt>VFS</dt><dd>{info.vfs}</dd>
-            <dt>Arquivo</dt><dd>{info.arquivo}</dd>
-            <dt>user_version</dt><dd data-testid="user-version">{info.userVersion} (app: {info.versaoApp})</dd>
-            <dt>Tabelas</dt><dd>{info.tabelas}</dd>
-            <dt>Clientes</dt><dd data-testid="contagem-clientes">{totalClientes ?? '…'}</dd>
-          </dl>
+        {#if fase === 'erro'}
+          <p class="alerta alerta-erro" role="alert" data-testid="erro-banco">{erro}</p>
+        {:else if fase === 'iniciando'}
+          <p class="muted">Abrindo banco…</p>
+        {:else}
+          {#if avisoPersistencia}
+            <p class="alerta alerta-aviso" role="status">{avisoPersistencia}</p>
+          {/if}
+
+          {#if aba === 'clientes'}
+            <Clientes abrirId={clienteParaAbrir} aoMudar={() => atualizarContagem().catch(() => {})} />
+          {:else if aba === 'veiculos'}
+            <Veiculos aoAbrirCliente={abrirCliente} />
+          {:else}
+            <div class="grade-cartoes">
+              <section class="cartao">
+                <h3>Banco de dados</h3>
+                <p class="muted">Clientes cadastrados</p>
+                <p class="metrica" data-testid="contagem-clientes">{totalClientes ?? '…'}</p>
+                {#if info}
+                  <dl>
+                    <dt>SQLite</dt><dd>{info.sqlite}</dd>
+                    <dt>VFS</dt><dd>{info.vfs}</dd>
+                    <dt>Arquivo</dt><dd>{info.arquivo}</dd>
+                    <dt>user_version</dt><dd data-testid="user-version">{info.userVersion} (app: {info.versaoApp})</dd>
+                    <dt>Tabelas</dt><dd>{info.tabelas}</dd>
+                  </dl>
+                {/if}
+                <button type="button" class="btn-pequeno" data-testid="btn-gravar-teste" onclick={gravarTeste} disabled={ocupado}>
+                  Gravar registro de teste
+                </button>
+              </section>
+
+              <section class="cartao">
+                <h3>Armazenamento</h3>
+                {#if persistencia}
+                  <StatusArmazenamento {...persistencia} />
+                {:else}
+                  <p class="muted">Não disponível.</p>
+                {/if}
+              </section>
+
+              <section class="cartao">
+                <h3>Backup</h3>
+                <p class="muted">Os dados ficam só neste computador. Exporte um backup com frequência.</p>
+                <div class="row">
+                  <button type="button" class="btn-primario" data-testid="btn-exportar" onclick={exportar} disabled={ocupado}>Exportar backup</button>
+                  <button type="button" data-testid="btn-importar" onclick={() => inputArquivo?.click()} disabled={ocupado}>
+                    Importar backup
+                  </button>
+                </div>
+                <input
+                  bind:this={inputArquivo}
+                  type="file"
+                  accept=".sqlite,.db,application/vnd.sqlite3,application/octet-stream"
+                  data-testid="input-importar"
+                  hidden
+                  onchange={importar}
+                />
+                {#if msgBackup}<p class="alerta alerta-sucesso" role="status" data-testid="msg-backup">{msgBackup}</p>{/if}
+                {#if erroBackup}<p class="alerta alerta-erro" role="alert" data-testid="erro-backup">{erroBackup}</p>{/if}
+              </section>
+            </div>
+          {/if}
         {/if}
-        <button type="button" data-testid="btn-gravar-teste" onclick={gravarTeste} disabled={ocupado}>
-          Gravar registro de teste
-        </button>
-      </section>
-
-      <section>
-        <h2>Backup</h2>
-        <button type="button" data-testid="btn-exportar" onclick={exportar} disabled={ocupado}>Exportar backup</button>
-        <button type="button" data-testid="btn-importar" onclick={() => inputArquivo?.click()} disabled={ocupado}>
-          Importar backup
-        </button>
-        <input
-          bind:this={inputArquivo}
-          type="file"
-          accept=".sqlite,.db,application/vnd.sqlite3,application/octet-stream"
-          data-testid="input-importar"
-          hidden
-          onchange={importar}
-        />
-        {#if msgBackup}<p role="status" data-testid="msg-backup">{msgBackup}</p>{/if}
-        {#if erroBackup}<p class="erro" role="alert" data-testid="erro-backup">{erroBackup}</p>{/if}
-      </section>
-      {/if}
-    {/if}
-  </main>
+      </main>
+    </div>
+  </div>
 {/if}
 
 <style>
-  dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; }
-  dt { font-weight: 600; }
-  dd { margin: 0; font-family: monospace; }
-  .erro { color: #b91c1c; }
-  .aviso { color: #92400e; background: #fef3c7; padding: 0.5rem; }
-  section { margin-top: 1rem; }
-  button { margin-right: 0.5rem; }
-  .abas { display: flex; gap: 0.25rem; border-bottom: 2px solid #d1d5db; margin-bottom: 1rem; }
-  .abas button { margin: 0; padding: 0.5rem 1.25rem; border: 1px solid #d1d5db; border-bottom: none; background: #f9fafb; font-size: 1rem; cursor: pointer; }
-  .abas button.sel { background: #fff; font-weight: 700; border-color: #3b82f6; }
+  .app { display: grid; grid-template-columns: 15rem 1fr; min-height: 100vh; }
+  .lateral { background: var(--cor-lateral); color: var(--cor-lateral-texto); padding: var(--esp-4); position: sticky; top: 0; height: 100vh; }
+  .marca { display: flex; align-items: center; gap: var(--esp-2); color: #fff; margin-bottom: var(--esp-5); }
+  .marca svg { color: var(--cor-foco); flex: none; }
+  .marca h1 { font-size: 1.05rem; margin: 0; color: #fff; }
+  .menu { display: grid; gap: var(--esp-1); }
+  .menu button { justify-content: flex-start; width: 100%; min-height: 2.75rem; background: transparent; border: none; color: inherit; font-size: var(--txt-md); font-weight: 500; }
+  .menu button:hover:not(:disabled) { background: var(--cor-lateral-ativo); border: none; }
+  .menu button.sel { background: var(--cor-lateral-ativo); color: #fff; box-shadow: inset 3px 0 0 var(--cor-foco); }
+  .principal { min-width: 0; display: flex; flex-direction: column; }
+  .topo { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--esp-4); padding: var(--esp-4) var(--esp-6); background: var(--cor-superficie); border-bottom: 1px solid var(--cor-borda); position: sticky; top: 0; z-index: 5; }
+  .titulo-pagina { margin: 0; line-height: var(--alvo); }
+  .conteudo { width: 100%; max-width: 72rem; padding: var(--esp-5) var(--esp-6); margin: 0 auto; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: var(--esp-1) var(--esp-4); font-size: var(--txt-sm); margin: var(--esp-3) 0; }
+  dt { font-weight: 600; color: var(--cor-texto-suave); }
+  dd { margin: 0; font-family: var(--fonte-mono); word-break: break-all; }
+
+  @media (max-width: 900px) {
+    .app { grid-template-columns: 1fr; }
+    .lateral { position: static; height: auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--esp-2); padding: var(--esp-2) var(--esp-4); }
+    .marca { margin: 0; }
+    .menu { display: flex; }
+    .menu button { width: auto; }
+    .topo { position: static; flex-wrap: wrap; padding: var(--esp-3) var(--esp-4); }
+    .conteudo { padding: var(--esp-4); }
+  }
 </style>
+

@@ -1,0 +1,73 @@
+﻿:root {
+  --cor-primaria: #1f5f74;
+  --cor-primaria-hover: #174a5b;
+  --cor-primaria-suave: #e1eff3;
+  --cor-acento: #c2570c;
+  --cor-acento-hover: #a54a0a;
+  --cor-acento-texto: #ffffff;
+  --cor-fundo: #f3f5f7;
+  --cor-superficie: #ffffff;
+  --cor-superficie-2: #f7f9fa;
+  --cor-borda: #d5dce1;
+  --cor-texto: #1b2a32;
+  --cor-texto-suave: #55656f;
+  --cor-lateral: #17323d;
+  --cor-lateral-texto: #cfe0e7;
+  --cor-lateral-ativo: #24505f;
+  --cor-sucesso: #166534;
+  --cor-sucesso-bg: #e3f4e8;
+  --cor-aviso: #8a4b05;
+  --cor-aviso-bg: #fdf0d5;
+  --cor-erro: #a31d1d;
+  --cor-erro-bg: #fce8e8;
+  --cor-foco: #e08a2e;
+
+  --esp-1: 0.25rem;
+  --esp-2: 0.5rem;
+  --esp-3: 0.75rem;
+  --esp-4: 1rem;
+  --esp-5: 1.5rem;
+  --esp-6: 2rem;
+
+  --raio: 8px;
+  --raio-sm: 5px;
+  --sombra: 0 1px 2px rgb(16 40 50 / 0.06), 0 2px 8px rgb(16 40 50 / 0.06);
+  --sombra-forte: 0 8px 24px rgb(16 40 50 / 0.18);
+
+  --fonte: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --fonte-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  --txt-xs: 0.8125rem;
+  --txt-sm: 0.875rem;
+  --txt-md: 1rem;
+  --txt-lg: 1.25rem;
+  --txt-xl: 1.625rem;
+  --alvo: 2.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-primaria: #4aa3bd;
+    --cor-primaria-hover: #6cb8cf;
+    --cor-primaria-suave: #1c3943;
+    --cor-acento: #e07a2b;
+    --cor-acento-hover: #f08f44;
+    --cor-acento-texto: #1a0d02;
+    --cor-fundo: #0f1b21;
+    --cor-superficie: #172830;
+    --cor-superficie-2: #1c303a;
+    --cor-borda: #2c424d;
+    --cor-texto: #e6eef2;
+    --cor-texto-suave: #9db2bd;
+    --cor-lateral: #0a1419;
+    --cor-lateral-texto: #b4c9d2;
+    --cor-lateral-ativo: #1c3943;
+    --cor-sucesso: #7fd79a;
+    --cor-sucesso-bg: #153322;
+    --cor-aviso: #f2c36b;
+    --cor-aviso-bg: #3a2b0e;
+    --cor-erro: #ff9a9a;
+    --cor-erro-bg: #3d1818;
+    --sombra: 0 1px 2px rgb(0 0 0 / 0.4);
+    --sombra-forte: 0 8px 24px rgb(0 0 0 / 0.5);
+  }
+}

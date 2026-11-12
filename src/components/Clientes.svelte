@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { clientesRepo, veiculosRepo } from '../db/repos';
   import type { Cliente } from '../db/repos/clientes';
   import type { Veiculo } from '../db/repos/veiculos';
@@ -131,25 +131,29 @@
 </script>
 
 <div class="duas-colunas">
-  <section>
-    <h2>Clientes</h2>
-    <div class="barra">
+  <section class="cartao stack">
+    <div class="row">
       <input
+        class="busca-cli"
         type="search"
         data-testid="filtro-clientes"
-        placeholder="Nome, telefone, documento ou placa"
+        aria-label="Filtrar clientes"
+        placeholder="Nome, telefone ou placa"
         bind:value={filtro}
       />
-      <button type="button" data-testid="btn-novo-cliente" onclick={novo}>Novo cliente</button>
+      <button type="button" class="btn-primario" data-testid="btn-novo-cliente" onclick={novo}>Novo cliente</button>
     </div>
     <label class="inline">
       <input type="checkbox" bind:checked={incluirInativos} data-testid="chk-inativos" /> Mostrar inativos
     </label>
-    {#if erroLista}<p class="erro" role="alert">{erroLista}</p>{/if}
+    {#if erroLista}<p class="alerta alerta-erro" role="alert">{erroLista}</p>{/if}
     {#if carregando}
-      <p>Carregando…</p>
+      <p class="muted">Carregando…</p>
     {:else if lista.length === 0}
-      <p data-testid="clientes-vazio">Nenhum cliente encontrado.</p>
+      <div class="vazio" data-testid="clientes-vazio">
+        <strong>{filtro.trim() ? 'Nenhum cliente encontrado' : 'Nenhum cliente ainda'}</strong>
+        {filtro.trim() ? 'Tente outro termo de busca.' : 'Clique em "Novo cliente" para cadastrar o primeiro.'}
+      </div>
     {:else}
       <ul class="lista" data-testid="lista-clientes">
         {#each lista as c (c.id)}
@@ -162,8 +166,8 @@
               onclick={() => abrir(c)}
             >
               <strong>{c.nome}</strong>
-              {#if c.telefone}<span>{c.telefone}</span>{/if}
-              {#if !c.ativo}<em>(inativo)</em>{/if}
+              {#if c.telefone}<span class="muted">{c.telefone}</span>{/if}
+              {#if !c.ativo}<span class="badge badge-inativo">inativo</span>{/if}
             </button>
           </li>
         {/each}
@@ -171,24 +175,31 @@
     {/if}
   </section>
 
-  <section>
+  <section class="cartao stack">
     {#if editando}
-      <h2>{editando === 'novo' ? 'Novo cliente' : 'Editar cliente'}</h2>
-      <form onsubmit={salvar} data-testid="form-cliente" class="form">
-        <label>Nome * <input data-testid="cliente-nome" bind:value={nome} required /></label>
-        <label>CPF/CNPJ (opcional) <input data-testid="cliente-documento" bind:value={documento} /></label>
-        <label>Telefone <input data-testid="cliente-telefone" bind:value={telefone} /></label>
-        <label>E-mail <input data-testid="cliente-email" type="email" bind:value={email} /></label>
-        <label>Endereço <input data-testid="cliente-endereco" bind:value={endereco} /></label>
-        {#if erroForm}<p class="erro" role="alert" data-testid="erro-cliente">{erroForm}</p>{/if}
-        {#if msg}<p role="status" data-testid="msg-cliente">{msg}</p>{/if}
-        <div>
+      <h2>
+        {editando === 'novo' ? 'Novo cliente' : 'Editar cliente'}
+        {#if editando !== 'novo'}
+          <span class="badge" class:badge-ativo={editando.ativo} class:badge-inativo={!editando.ativo}>{editando.ativo ? 'ativo' : 'inativo'}</span>
+        {/if}
+      </h2>
+      <form onsubmit={salvar} data-testid="form-cliente">
+        <div class="form-grid">
+          <label class="full">Nome * <input data-testid="cliente-nome" bind:value={nome} required /></label>
+          <label>CPF/CNPJ (opcional) <input data-testid="cliente-documento" bind:value={documento} /></label>
+          <label>Telefone <input data-testid="cliente-telefone" bind:value={telefone} /></label>
+          <label class="full">E-mail <input data-testid="cliente-email" type="email" bind:value={email} /></label>
+          <label class="full">Endereço <input data-testid="cliente-endereco" bind:value={endereco} /></label>
+        </div>
+        {#if erroForm}<p class="alerta alerta-erro" role="alert" data-testid="erro-cliente">{erroForm}</p>{/if}
+        {#if msg}<p class="alerta alerta-sucesso" role="status" data-testid="msg-cliente">{msg}</p>{/if}
+        <div class="form-acoes">
           <button type="submit" data-testid="btn-salvar-cliente">Salvar cliente</button>
           {#if editando !== 'novo'}
             {#if editando.ativo}
-              <button type="button" data-testid="btn-inativar-cliente" onclick={inativar}>Inativar</button>
+              <button type="button" class="btn-perigo" data-testid="btn-inativar-cliente" onclick={inativar}>Inativar</button>
             {:else}
-              <button type="button" data-testid="btn-reativar-cliente" onclick={reativar}>Reativar</button>
+              <button type="button" class="btn-secundario" data-testid="btn-reativar-cliente" onclick={reativar}>Reativar</button>
             {/if}
           {/if}
         </div>
@@ -197,15 +208,17 @@
       {#if editando !== 'novo'}
         <h3>Veículos</h3>
         {#if veiculos.length === 0}
-          <p data-testid="veiculos-vazio">Nenhum veículo cadastrado.</p>
+          <div class="vazio" data-testid="veiculos-vazio"><strong>Nenhum veículo cadastrado</strong>Adicione o primeiro veículo deste cliente.</div>
         {:else}
           <ul class="lista" data-testid="lista-veiculos">
             {#each veiculos as v (v.id)}
-              <li data-testid="veiculo-item">
-                <strong data-testid="veiculo-item-placa">{v.placa}</strong>
-                {[v.marca, v.modelo, v.ano, v.cor].filter(Boolean).join(' ')}
-                {#if v.kmAtual !== null}— {v.kmAtual} km{/if}
-                <button type="button" onclick={() => (formVeiculo = v)}>Editar</button>
+              <li class="veiculo" data-testid="veiculo-item">
+                <span>
+                  <strong class="mono" data-testid="veiculo-item-placa">{v.placa}</strong>
+                  {[v.marca, v.modelo, v.ano, v.cor].filter(Boolean).join(' ')}
+                  {#if v.kmAtual !== null}<span class="muted">— {v.kmAtual} km</span>{/if}
+                </span>
+                <button type="button" class="btn-pequeno" onclick={() => (formVeiculo = v)}>Editar</button>
               </li>
             {/each}
           </ul>
@@ -220,29 +233,24 @@
             />
           {/key}
         {:else}
-          <button type="button" data-testid="btn-add-veiculo" onclick={() => (formVeiculo = 'novo')}>
-            Adicionar veículo
-          </button>
+          <div><button type="button" class="btn-secundario" data-testid="btn-add-veiculo" onclick={() => (formVeiculo = 'novo')}>
+            + Adicionar veículo
+          </button></div>
         {/if}
       {/if}
     {:else}
-      <p>Selecione um cliente na lista ou clique em "Novo cliente".</p>
+      <div class="vazio"><strong>Nenhum cliente selecionado</strong>Selecione um cliente na lista ou clique em "Novo cliente".</div>
     {/if}
   </section>
 </div>
 
 <style>
-  .duas-colunas { display: grid; grid-template-columns: minmax(18rem, 1fr) minmax(22rem, 1.3fr); gap: 2rem; align-items: start; }
-  .barra { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
-  .barra input { flex: 1; padding: 0.4rem; font-size: 1rem; }
-  .inline { display: block; margin-bottom: 0.5rem; }
-  .lista { list-style: none; padding: 0; margin: 0; }
-  .lista li { padding: 0.3rem 0; border-bottom: 1px solid #e5e7eb; }
-  .item { display: flex; gap: 0.75rem; width: 100%; text-align: left; padding: 0.5rem; cursor: pointer; background: #fff; border: 1px solid #e5e7eb; border-radius: 4px; font-size: 1rem; }
-  .item.ativo { background: #dbeafe; border-color: #3b82f6; }
-  .form { display: grid; gap: 0.5rem; max-width: 28rem; }
-  label { display: grid; gap: 0.15rem; font-weight: 600; }
-  .form input { padding: 0.35rem; font-size: 1rem; font-weight: 400; }
-  .erro { color: #b91c1c; margin: 0; }
-  button { margin-right: 0.5rem; }
+  .duas-colunas { display: grid; grid-template-columns: minmax(18rem, 1fr) minmax(24rem, 1.4fr); gap: var(--esp-4); align-items: start; }
+  .busca-cli { flex: 1; min-width: 12rem; width: auto !important; }
+  .lista { list-style: none; padding: 0; margin: 0; display: grid; gap: var(--esp-2); }
+  .item { display: flex; align-items: center; justify-content: flex-start; gap: var(--esp-3); width: 100%; min-height: 2.75rem; text-align: left; font-weight: 400; font-size: var(--txt-md); }
+  .item.ativo { background: var(--cor-primaria-suave); border-color: var(--cor-primaria); }
+  .veiculo { display: flex; justify-content: space-between; align-items: center; gap: var(--esp-3); padding: var(--esp-2) var(--esp-3); border: 1px solid var(--cor-borda); border-radius: var(--raio-sm); font-size: var(--txt-sm); }
+  @media (max-width: 900px) { .duas-colunas { grid-template-columns: 1fr; } }
 </style>
+
