@@ -8,12 +8,15 @@ const chrome = [
 const edge = existsSync('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe');
 const channel = chrome ? 'chrome' : edge ? 'msedge' : undefined;
 
+// Porta configurável (E2E_PORT) para vários agentes/execuções em paralelo não colidirem.
+const porta = Number(process.env.E2E_PORT ?? 4173);
+
 export default defineConfig({
   testDir: 'tests/e2e',
-  use: { baseURL: 'http://localhost:4173', channel },
+  use: { baseURL: `http://localhost:${porta}`, channel },
   webServer: {
-    command: 'npm run build && npm run preview -- --port 4173 --strictPort',
-    port: 4173,
+    command: `npm run build && npm run preview -- --port ${porta} --strictPort`,
+    port: porta,
     reuseExistingServer: false,
     timeout: 180_000
   }

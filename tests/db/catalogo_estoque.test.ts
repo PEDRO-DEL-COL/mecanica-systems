@@ -422,7 +422,7 @@ describe('estorno', () => {
     // saída de OS (criada pela RPC da OS no futuro) não é estornada aqui
     const s = await um<string>(
       `insert into public.movimento_estoque (org_id, item_id, tipo, quantidade, os_id)
-       values ($1, $2, 'saida_os', -1, gen_random_uuid()) returning id as v`,
+       values ($1, $2, 'saida_os', -1, null) returning id as v`,
       [A.orgId, item]
     );
     expect(await erroDe(estornar(db, estEscrita, s, 'Cancelamento'))).toMatch(/própria OS/);

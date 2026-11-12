@@ -7,8 +7,11 @@ Plataforma SaaS 100% online para oficinas mecânicas (multi-oficina). Planejamen
 - `docs/PLANO-CONSTRUCAO.md`: ondas 0/A-E, tarefas com arquivos exclusivos, convenções obrigatórias e modelo de prompt.
 - `docs/pesquisa/`: pesquisa de apoio (marcas [CONH]/[VERIFICAR]/[?] = não verificado).
 
-## Status (2026-11-12)
-Núcleo pronto: migrações `nucleo_*` (oficina, membro, permissões por área, convite, RLS) com testes PGlite; site público. Próximo: Onda 0 do plano.
+## Status (2026-11-12, trabalho pausado por falta de créditos)
+FEITO (check 0 erros, 143 testes unitários; E2E com rede simulada): Onda 0 (base de código, kit de UI, migração comum), Onda A (login/cadastro/recuperação, shell do app com menu por permissão, onboarding, migrações de clientes/veículos e catálogo/estoque/fornecedores) e Onda B menos B5: telas de clientes (B1), veículos (B2), catálogo (B3), estoque/fornecedores (B4). Nova área de permissão `caixa` (receber pagamento sem ver custos); telas do caixa em `/app/caixa`.
+INCOMPLETO — RETOMAR AQUI: tarefa B5 (OPUS, banco das ordens de serviço) foi interrompida. Existem `supabase/migrations/20261115100000_ordens.sql`, `20261115110000_ordens_rpc.sql`, `tests/db/ordens.test.ts` e `tests/db/fabricas/ordens.ts` como RASCUNHO NÃO REVISADO. Faltam `src/lib/{tipos,repos,validacao}/ordens.ts`, `src/lib/puro/os.ts` + `tests/os.test.ts`, e revisar/concluir as migrações e testes conforme docs/PLANO-CONSTRUCAO.md (B5). Depois: Onda C (telas da OS, pátio, aprovação, checklist, financeiro C6, painel/LGPD C7), Onda D, Onda E (revisão de segurança Opus, E2E real).
+AJUSTES PENDENTES: busca de veículos por dono; gravar o motivo da transferência de veículo; devolução ao fornecedor sem tela; o `goto` do SvelteKit 3.2 não aceita keepFocus/noScroll (usar `{ replace: true, reset: false }`).
+BLOQUEIO DO PEDRO: criar projeto Supabase em São Paulo (o atual está em East US) e passar URL + anon key (nunca service_role nem senha do banco); o 1º teste real do login/cadastro depende disso. Trocar a senha do banco atual (foi exposta no chat).
 
 ## Decisões
 - Plataforma online multi-oficina; Supabase (região São Paulo) com Auth + RLS + RPCs. Migrations em `supabase/migrations`.
