@@ -183,7 +183,7 @@
           <span class="badge" class:badge-ativo={editando.ativo} class:badge-inativo={!editando.ativo}>{editando.ativo ? 'ativo' : 'inativo'}</span>
         {/if}
       </h2>
-      <form onsubmit={salvar} data-testid="form-cliente">
+      <form class="stack" onsubmit={salvar} data-testid="form-cliente">
         <div class="form-grid">
           <label class="full">Nome * <input data-testid="cliente-nome" bind:value={nome} required /></label>
           <label>CPF/CNPJ (opcional) <input data-testid="cliente-documento" bind:value={documento} /></label>

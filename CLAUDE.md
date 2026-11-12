@@ -20,8 +20,8 @@ Sistema de gestão para oficinas mecânicas: PWA local-first (offline, dados no 
 - Verificar: `npm test`, `npm run check`, `npm run build`, `npm run e2e` (precisa de Chrome ou Edge).
 
 ## Status (atualizado em 2026-11-11)
-- FEITO e verificado (testes unitários + E2E em Chrome): fase 0 completa (PWA, SQLite OPFS em worker, migrações, backup exportar/importar, trava de aba única, persistência) e passo 2 da fase 1 (clientes e veículos, busca por placa).
-- PRÓXIMO: 3 Catálogo de serviços e peças -> 4 Orçamento/OS (CDC: só vai a em_execucao com aprovação) -> 5 Pagamentos e estoque -> 6 PDF/WhatsApp -> 7 lembretes de backup -> 8 teste com oficina real. Depois: publicar no Cloudflare Pages.
+- FEITO e verificado (testes unitários + E2E em Chrome): fase 0 completa (PWA, SQLite OPFS em worker, migrações, backup exportar/importar, trava de aba única, persistência) e passos 2 e 3 da fase 1 (clientes e veículos com busca por placa; catálogo de serviços e peças com estoque mínimo), mais design system em src/styles (tokens.css/base.css, barra lateral, modo escuro).
+- PRÓXIMO: 4 Orçamento/OS (CDC: só vai a em_execucao com aprovação) -> 5 Pagamentos e estoque -> 6 PDF/WhatsApp -> 7 lembretes de backup -> 8 teste com oficina real. Depois: publicar no Cloudflare Pages.
 - Pendentes do Pedro: proteger a branch main no GitHub; apagar a pasta antiga no OneDrive.
 
 ## Decisões novas

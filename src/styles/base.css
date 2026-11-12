@@ -1,5 +1,5 @@
 ﻿*, *::before, *::after { box-sizing: border-box; }
-html { color-scheme: light dark; }
+html { color-scheme: light dark; scroll-padding-top: 6rem; }
 body {
   margin: 0;
   font-family: var(--fonte);
@@ -54,6 +54,7 @@ label.inline { display: flex; align-items: center; gap: var(--esp-2); font-weigh
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--esp-3) var(--esp-4); }
 .form-grid .full { grid-column: 1 / -1; }
 .form-acoes { display: flex; flex-wrap: wrap; gap: var(--esp-2); margin-top: var(--esp-2); }
+.stack > .form-acoes { margin-top: 0; }
 
 /* Cartoes */
 .cartao { background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: var(--raio); box-shadow: var(--sombra); padding: var(--esp-5); }
@@ -87,6 +88,8 @@ tbody tr:last-child td { border-bottom: none; }
 
 /* Utilitarios */
 .stack { display: grid; gap: var(--esp-4); align-content: start; }
+/* Dentro de pilhas o espacamento vem do gap; margem do alerta nao pode somar/colapsar. */
+.stack > .alerta { margin: 0; }
 .row { display: flex; flex-wrap: wrap; gap: var(--esp-2); align-items: center; }
 .muted { color: var(--cor-texto-suave); }
 .mono { font-family: var(--fonte-mono); }

@@ -10,15 +10,17 @@
   import BuscaPlaca from './components/BuscaPlaca.svelte';
   import Clientes from './components/Clientes.svelte';
   import Veiculos from './components/Veiculos.svelte';
+  import Catalogo from './components/Catalogo.svelte';
   import './styles/tokens.css';
   import './styles/base.css';
 
-  type Aba = 'inicio' | 'clientes' | 'veiculos';
+  type Aba = 'inicio' | 'clientes' | 'veiculos' | 'catalogo';
   // Para adicionar uma tela: incluir aqui (icone = path SVG 24x24) e tratar no bloco {#if aba} abaixo.
   const rotas: { id: Aba; rotulo: string; icone: string }[] = [
     { id: 'inicio', rotulo: 'Início', icone: 'M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10' },
     { id: 'clientes', rotulo: 'Clientes', icone: 'M16 19v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 17.5V19M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM20 19v-1.5a3.5 3.5 0 0 0-2.5-3.35M15.5 4.2a3.5 3.5 0 0 1 0 6.6' },
     { id: 'veiculos', rotulo: 'Veículos', icone: 'M4 16v-4l2-5h12l2 5v4M4 16h16M4 16v2h3v-2M17 16v2h3v-2M7.5 12.5h.01M16.5 12.5h.01' },
+    { id: 'catalogo', rotulo: 'Catálogo', icone: 'M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3zM4 7.5l8 4.5 8-4.5M12 12v9' },
   ];
   const tituloAba = $derived(rotas.find((r) => r.id === aba)?.rotulo ?? '');
   let aba = $state<Aba>('inicio');
@@ -205,6 +207,8 @@
             <Clientes abrirId={clienteParaAbrir} aoMudar={() => atualizarContagem().catch(() => {})} />
           {:else if aba === 'veiculos'}
             <Veiculos aoAbrirCliente={abrirCliente} />
+          {:else if aba === 'catalogo'}
+            <Catalogo />
           {:else}
             <div class="grade-cartoes">
               <section class="cartao">
