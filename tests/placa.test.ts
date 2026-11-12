@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { normalizarPlaca, placaValida, validarPlaca } from '../src/lib/placa';
-import { normalizarDocumento } from '../src/lib/documento';
+import { normalizarPlaca, placaValida, validarPlaca } from '../src/lib/puro/placa';
+import { normalizarDocumento } from '../src/lib/puro/documento';
 
 describe('placa', () => {
   it('normaliza', () => {

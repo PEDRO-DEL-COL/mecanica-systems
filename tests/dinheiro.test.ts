@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatarReais, parseReais } from '../src/lib/dinheiro';
+import { formatarReais, parseReais } from '../src/lib/puro/dinheiro';
 
 describe('dinheiro', () => {
   it('parseReais', () => {

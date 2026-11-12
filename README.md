@@ -1,25 +1,15 @@
-﻿# Mecanica Systems
+# Mecanica Systems
 
-Sistema de gestão para oficinas mecânicas, em desenvolvimento. Roda no navegador como PWA, funciona offline e guarda os dados no computador do cliente (local-first, SQLite no navegador).
+Plataforma online para gestão de oficinas mecânicas: clientes, veículos, orçamentos e ordens de serviço, com acesso por oficina e permissões por área.
 
-**Status:** fase 0 (fundação) implementada. Veja [docs/PROJETO.md](docs/PROJETO.md).
-
-## Requisitos
-- Windows com Google Chrome ou Microsoft Edge atualizado (OPFS e Web Locks). Safari não é suportado.
-- Node.js e npm para desenvolvimento.
+Em desenvolvimento. Stack: SvelteKit + TypeScript (adapter-static) e Supabase.
 
 ## Como rodar
-```
-npm install
-npm run dev       # servidor de desenvolvimento
-npm run build     # build de produção em dist/
-npm test          # testes unitários (Vitest)
-npm run e2e       # testes E2E (Playwright; faz build e preview na porta 4173)
-```
-Para o E2E use Chrome/Edge instalados ou rode `npx playwright install chromium`.
+1. `npm install`
+2. Copie `.env.example` para `.env.local` e preencha `PUBLIC_SUPABASE_URL` e `PUBLIC_SUPABASE_ANON_KEY`.
+3. `npm run dev` (ou `npm run build && npm run preview`).
 
-## Aviso sobre backup
-Os dados ficam só no navegador deste computador. Limpar dados do navegador, trocar de PC ou perfil os apaga. Exporte backups com regularidade. Importar um backup substitui todos os dados atuais (o app baixa antes um backup automático do banco atual).
+Verificações: `npm run check`, `npm test`, `npm run e2e`.
 
 ## Licença
-Copyright (c) 2026 Pedro. Todos os direitos reservados. Código publicado apenas para visualização/portfólio; não é permitido copiar, modificar ou reutilizar. Veja [LICENSE](LICENSE).
+Copyright (c) Pedro. Todos os direitos reservados (All rights reserved). Veja `LICENSE`.
